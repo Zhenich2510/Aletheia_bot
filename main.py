@@ -6,7 +6,7 @@ from start_bot import on_startup
 
 
 def main():
-
+    print('new row')
     user.register_handlers_user(dp)
     admin.register_handlers_admin(dp)
     # other.register_handlers_other(dp)
