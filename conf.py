@@ -30,4 +30,5 @@ cmd_stop_text = """
 Не забуть потім скинути).
 """
 
-link_to_bd = "Desktop/info_of_admins"
+link_to_database = "/Users/yevheniy/tools/db_of_admins"
+database_name = link_to_database.split('/')[-1]
