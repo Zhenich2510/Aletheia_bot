@@ -1,16 +1,20 @@
 from aiogram import types
 from aiogram.dispatcher import Dispatcher, FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from start_bot import bot
 
+from start_bot import bot
+from database import add_info_to_db
 from conf import cmd_admin_text, cmd_load_text, get_conclusion_text, cmd_stop_text
 
 ID = None
 admins = 431687242
+data = {}
+
 
 class FSMAdmin(StatesGroup):
     news_text = State()
     conclusion = State()
+
 
 # @dp.message_handler('admin')
 async def cmd_admin(message: types.Message):
@@ -27,6 +31,7 @@ async def cmd_load(message: types.Message):
         await FSMAdmin.news_text.set()
         await bot.send_message(message.from_user.id, cmd_load_text)
 
+
 # @dp.message_handler('stop', state='*')
 async def cmd_stop(message: types.Message, state: FSMContext):
     if ID == message.from_user.id:
@@ -36,20 +41,26 @@ async def cmd_stop(message: types.Message, state: FSMContext):
         await state.finish()
         await message.reply(cmd_stop_text)
 
+
 # @dp.message_handler(state=FSMAdmin.news_text)
 async def get_text(message: types.Message, state: FSMContext):
     if ID == message.from_user.id:
-        info = "Ти відправив:\n" + message.text
-        await bot.send_message(message.from_user.id, info)
+        data['user_id'] = message.from_user.id
+        data['user_nickname'] = message.from_user.username
+        data['user_text'] = message.text
         await FSMAdmin.next()
         await bot.send_message(message.from_user.id, get_conclusion_text)
+
 
 # @dp.message_handler(state=FSMAdmin.news_text)
 async def get_conclusion(message: types.Message, state: FSMContext):
     if ID == message.from_user.id:
-        conclusion = message.text
-        await bot.send_message(message.from_user.id, conclusion)
-
+        if message.text == '1':
+            data['predict'] = True
+        elif message.text == '0':
+            data['predict'] = False
+        add_info_to_db(data['user_id'], data['user_nickname'], data['user_text'], data['predict'])
+        await message.reply('Done')
         await state.finish()
 
 
