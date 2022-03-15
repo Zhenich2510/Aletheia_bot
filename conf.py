@@ -29,3 +29,5 @@ cmd_stop_text = """
 Відмінилось, як прикро...
 Не забуть потім скинути).
 """
+
+link_to_bd = "Desktop/info_of_admins"
